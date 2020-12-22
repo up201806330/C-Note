@@ -5,6 +5,8 @@ print_time(Message) :-
 	TS is ((T//10)*10)/1000,
 	nl, write(Message), write(' time: '), write(TS), write('s'), nl, nl.
 
+sat_count(+[1|L], N) :-
+   aggregate_all(count, L^labeling(L), N).
 
 % Applies restriction "Sum of all elements equals S" to every row in the Matrix
 % sum_rows(+Matrix, +S)
@@ -88,12 +90,7 @@ solver(Input, Output):-
 solve_and_display(Input, Output):-
     length(Input, Length),
     N is round(sqrt(Length)), nl,
-
-    % Display Input
-    write('Input board'), nl, nl,
-    make_rows(Input, N, InputRows),
-    write_board(InputRows), nl,
-
+    
     % Solver and statistics
     reset_timer,
     solver(Input, Output),
@@ -122,15 +119,61 @@ generator(Size, Output):-
     % Labeling
     labeling([value(randomSelector)], Res),
 
-    nl, write_board(Rows), nl,
+    %nl, write_board(Rows), nl,
 
     % Remove random digits
     maplist(truncate_to_rand, Res, Output).
+
+generator_unique(Size, Output):-
+    % Variables
+    N is round(exp(Size, 2)),
+    length(Res, N),
+    domain(Res, 1, 100),
+
+    make_rows(Res, Size, Rows),
+    transpose(Rows, Cols),
+    Sum is 100,                     % In future will be input (?)
+
+    % Restrictions
+    sum_rows(Rows, Sum),            % All rows sum to Sum
+    sum_rows(Cols, Sum),            % All columns sum to Sum
+    
+    % Labeling
+    labeling([value(randomSelector)], Res),
+
+    % Remove random digits
+    maplist(truncate_to_rand, Res, Output),
+
+    nl, write('Found a solution, checking if its unique... '),
+    findall(Result, solver(Output, Result), Outputs), 
+    length(Outputs, NOutputs), 
+    (
+        NOutputs = 1 ->
+        write('Found unique puzzle!'), nl
+        ;
+        write('Not unique, retrying'), nl, fail
+    ).
 
 generate_and_display(Size, Output):-
     % Generator and statistics
     reset_timer,
     generator(Size, Output),
+    print_time('Generator'), nl,
+    
+    length(Output, Length),
+    N is round(sqrt(Length)), nl,
+
+    %Display Output
+    write('Generated board'), nl, nl,
+    make_rows(Output, N, OutputRows),
+    write_board(OutputRows),
+
+    ask_for_solver(Output).
+
+generate_unique_and_display(Size, Output):-
+    % Generator and statistics
+    reset_timer,
+    generator_unique(Size, Output),
     print_time('Generator'), nl,
     
     length(Output, Length),
