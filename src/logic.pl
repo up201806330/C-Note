@@ -3,10 +3,7 @@ reset_timer :- statistics(walltime,_).
 print_time(Message) :-
 	statistics(walltime,[_,T]),
 	TS is ((T//10)*10)/1000,
-	nl, write(Message), write(' time: '), write(TS), write('s'), nl, nl.
-
-sat_count(+[1|L], N) :-
-   aggregate_all(count, L^labeling(L), N).
+	nl, write(Message), write(' time: '), write(TS), write('s'), nl.
 
 % Applies restriction "Sum of all elements equals S" to every row in the Matrix
 % sum_rows(+Matrix, +S)
@@ -28,15 +25,24 @@ make_rows([H|T], CurrRow, CurrRows, Counter, N, Rows):-
     X is Counter + 1,
     make_rows(T, NewCurrRow, CurrRows, X, N, Rows).
 
-% Applies restriction "Number includes digit given in input" to every element in Output (hardcoded for numbers until 100!!)
-% includes_digit(+Numbers, +Input)
-includes_digit(Numbers, Input):-
-    includes_digit(Numbers, Input, 1).
-includes_digit([], _, _).
-includes_digit([Number|T], Input, Index):-
-    nth1(Index, Input, Digit),
-    Number // 10 #= Digit #\/ (Number - Digit) mod 10 #= 0,
-    NewIndex is Index + 1, includes_digit(T, Input, NewIndex).
+% Applies restriction "Number includes digit given in input" to Var, given the max Length the number can have
+% includes_digit(+Var, +Input)
+includes_digit(Var, Input):-
+    Var mod 10  #= Input.
+includes_digit(Var, Input):-
+    Var #> 0,
+    Rest #= Var // 10,
+    includes_digit(Rest, Input).
+
+% Applies restriction "Number includes digit given in input" to every element in Output
+% includes_digit_list(+Vars, +Input)
+includes_digit_list(Vars, Input):-
+    includes_digit_list(Vars, Input, 1).
+includes_digit_list([], _, _).
+includes_digit_list([Var|T], Input, Index):-
+    nth1(Index, Input, InputNum),
+    includes_digit(Var, InputNum),
+    NewIndex is Index + 1, includes_digit_list(T, Input, NewIndex).
 
 % Custom labeling function to select random values from domain
 % randomSelector(+Var, +Rest, +BB, +BB1)
@@ -63,38 +69,43 @@ truncate_to(N, Number, Output):-
 % Truncates to a random digit of the number
 % truncate_to_rand(+Number, -Output)
 truncate_to_rand(Number, Output):-
-    RandMax is floor(log(10, Number)) + 1,
+    num_digits(Number, RandMax),
     random(0, RandMax, N),
     truncate_to(N, Number, Output).
 
-solver(Input, Output):-
+% Returns number of digits of a given number Num
+% num_digits(+Num, -Output)
+num_digits(Num, Output):-
+   Output is floor(log(10, max(Num, 1))) + 1.
+
+solver(Input, Sum, Output):-
     length(Input, Length),
     N is round(sqrt(Length)),
 
     % Decision variables
     length(Output, Length),
-    domain(Output, 1, 100),
+    DomainMax is Sum - N,
+    domain(Output, 1, DomainMax),
 
     make_rows(Output, N, Rows),
     transpose(Rows, Cols),
-    Sum is 100,                     % In future will be input (?)
 
     % Restrictions
-    sum_rows(Rows, Sum),            % All rows sum to Sum
-    sum_rows(Cols, Sum),            % All columns sum to Sum
-    includes_digit(Output, Input),  % All numbers include input digit
+    sum_rows(Rows, Sum),                % All rows sum to Sum
+    sum_rows(Cols, Sum),                % All columns sum to Sum
+    includes_digit_list(Output, Input), % All numbers include input digit
 
     % Labeling
     labeling([], Output).
 
-solve_and_display(Input, Output):-
+solve_and_display(Input, Sum):-
     length(Input, Length),
     N is round(sqrt(Length)), nl,
-    
+
     % Solver and statistics
     reset_timer,
-    solver(Input, Output),
-    print_time('Solver'), nl, nl,
+    solver(Input, Sum, Output),
+    print_time('Solver'), nl,
 
     % Display Output
     write('Output board'), nl, nl,
@@ -102,15 +113,15 @@ solve_and_display(Input, Output):-
     write_board(OutputRows).
 
 
-generator(Size, Output):-
+generator(Size, Sum, Output):-
     % Variables
     N is round(exp(Size, 2)),
     length(Res, N),
-    domain(Res, 1, 100),
+    DomainMax is Sum - N,
+    domain(Res, 1, DomainMax),
 
     make_rows(Res, Size, Rows),
     transpose(Rows, Cols),
-    Sum is 100,                     % In future will be input (?)
 
     % Restrictions
     sum_rows(Rows, Sum),            % All rows sum to Sum
@@ -124,15 +135,15 @@ generator(Size, Output):-
     % Remove random digits
     maplist(truncate_to_rand, Res, Output).
 
-generator_unique(Size, Output):-
+generator_unique(Size, Sum, Output):-
     % Variables
     N is round(exp(Size, 2)),
     length(Res, N),
-    domain(Res, 1, 100),
+    DomainMax is Sum - N,
+    domain(Res, 1, DomainMax),
 
     make_rows(Res, Size, Rows),
     transpose(Rows, Cols),
-    Sum is 100,                     % In future will be input (?)
 
     % Restrictions
     sum_rows(Rows, Sum),            % All rows sum to Sum
@@ -145,19 +156,33 @@ generator_unique(Size, Output):-
     maplist(truncate_to_rand, Res, Output),
 
     nl, write('Found a solution, checking if its unique... '),
-    findall(Result, solver(Output, Result), Outputs), 
-    length(Outputs, NOutputs), 
     (
-        NOutputs = 1 ->
-        write('Found unique puzzle!'), nl
-        ;
+        more_than_once(solver(Output, Sum, _)) ->
         write('Not unique, retrying'), nl, fail
+        ;
+        write('Found unique puzzle!'), nl
     ).
 
-generate_and_display(Size, Output):-
+generate_and_display(Size, Sum):-
     % Generator and statistics
     reset_timer,
-    generator(Size, Output),
+    generator(Size, Sum, Output),
+    print_time('Generator'), nl,
+    
+    length(Output, Length),
+    N is round(sqrt(Length)),
+
+    %Display Output
+    write('Generated board'), nl, nl,
+    make_rows(Output, N, OutputRows),
+    write_board(OutputRows),
+
+    ask_for_solver(Output, Sum).
+
+generate_unique_and_display(Size, Sum):-
+    % Generator and statistics
+    reset_timer,
+    generator_unique(Size, Sum, Output),
     print_time('Generator'), nl,
     
     length(Output, Length),
@@ -168,20 +193,4 @@ generate_and_display(Size, Output):-
     make_rows(Output, N, OutputRows),
     write_board(OutputRows),
 
-    ask_for_solver(Output).
-
-generate_unique_and_display(Size, Output):-
-    % Generator and statistics
-    reset_timer,
-    generator_unique(Size, Output),
-    print_time('Generator'), nl,
-    
-    length(Output, Length),
-    N is round(sqrt(Length)), nl,
-
-    %Display Output
-    write('Generated board'), nl, nl,
-    make_rows(Output, N, OutputRows),
-    write_board(OutputRows),
-
-    ask_for_solver(Output).
+    ask_for_solver(Output, Sum).

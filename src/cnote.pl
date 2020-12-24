@@ -2,6 +2,6 @@
 :-use_module(library(lists)).
 :-use_module(library(random)).
 :-use_module(library(aggregate)).
-:- [logic, display].
+:- [logic, display, utils, menus].
 
 
