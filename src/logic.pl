@@ -78,6 +78,8 @@ truncate_to_rand(Number, Output):-
 num_digits(Num, Output):-
    Output is floor(log(10, max(Num, 1))) + 1.
 
+% Solves a given puzzle
+% solver(+Input, +Sum, -Output)
 solver(Input, Sum, Output):-
     length(Input, Length),
     N is round(sqrt(Length)),
@@ -98,6 +100,8 @@ solver(Input, Sum, Output):-
     % Labeling
     labeling([], Output).
 
+% Calls solver and displays results
+% solve_and_display(+Input, +Sum)
 solve_and_display(Input, Sum):-
     length(Input, Length),
     N is round(sqrt(Length)), nl,
@@ -112,7 +116,8 @@ solve_and_display(Input, Sum):-
     make_rows(Output, N, OutputRows),
     write_board(OutputRows).
 
-
+% Generates a puzzle of given Size and target Sum
+% generator(+Size, +Sum, -Output)
 generator(Size, Sum, Output):-
     % Variables
     N is round(exp(Size, 2)),
@@ -135,6 +140,8 @@ generator(Size, Sum, Output):-
     % Remove random digits
     maplist(truncate_to_rand, Res, Output).
 
+% Generates a puzzle of given Size and target Sum, making sure it only has ONE solution
+% generator_unique(+Size, +Sum, -Output)
 generator_unique(Size, Sum, Output):-
     % Variables
     N is round(exp(Size, 2)),
@@ -163,6 +170,8 @@ generator_unique(Size, Sum, Output):-
         write('Found unique puzzle!'), nl
     ).
 
+% Calls generator and displays results
+% generate_and_display(+Size, +Sum)
 generate_and_display(Size, Sum):-
     % Generator and statistics
     reset_timer,
@@ -179,6 +188,8 @@ generate_and_display(Size, Sum):-
 
     ask_for_solver(Output, Sum).
 
+% Calls generator_unique and displays results
+% generate_unique_and_display(+Size, +Sum)
 generate_unique_and_display(Size, Sum):-
     % Generator and statistics
     reset_timer,

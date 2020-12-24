@@ -43,3 +43,11 @@ ask_for_solver(Input, Sum):-
         ;
         true
     ).
+
+enter_to_continue:-
+	write('Press Enter to continue.'), nl,
+	write(':- '), get_char(_), nl, write('Leaving'), nl, !.
+
+% Source: https://swi-prolog.discourse.group/t/useful-command-to-clear-the-console/976
+clear_terminal :-
+    write('\e[H\e[2J').

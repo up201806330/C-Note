@@ -1,5 +1,4 @@
 % Source: http://www.complang.tuwien.ac.at/ulrich/sicstus-prolog/call_nth.pl
-
 :- use_module(library(structs),
          [new/2,
           dispose/1,
@@ -52,11 +51,3 @@ max_list_nested([H|T], Counter, Return):-
    max_list(H, Max),
    NewMax is max(Max, Counter),
    max_list_nested(T, NewMax, Return).
-
-enter_to_continue:-
-	write('Press Enter to continue.'), nl,
-	write(':- '), get_char(_), nl, write('Leaving'), nl, !.
-
-% Source: https://swi-prolog.discourse.group/t/useful-command-to-clear-the-console/976
-clear_terminal :-
-    write('\e[H\e[2J').
