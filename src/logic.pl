@@ -34,9 +34,9 @@ includes_digit(Var, Input):-
     Rest #= Var // 10,
     includes_digit(Rest, Input).
 
-% Applies restriction "Number includes digit given in input" to every element in Output
-% includes_digit_list(+Vars, +Input)
-includes_digit_list(Vars, Input):-
+% Applies restriction "Number includes digit given in Input" to every element in Vars
+% includes_digit_list(+Input, +Vars)
+includes_digit_list(Input, Vars):-
     includes_digit_list(Vars, Input, 1).
 includes_digit_list([], _, _).
 includes_digit_list([Var|T], Input, Index):-
@@ -95,7 +95,7 @@ solver(Input, Sum, Output):-
     % Restrictions
     sum_rows(Rows, Sum),                % All rows sum to Sum
     sum_rows(Cols, Sum),                % All columns sum to Sum
-    includes_digit_list(Output, Input), % All numbers include input digit
+    includes_digit_list(Input, Output), % All numbers include input digit
 
     % Labeling
     labeling([], Output).
@@ -110,6 +110,7 @@ solve_and_display(Input, Sum):-
     reset_timer,
     solver(Input, Sum, Output),
     print_time('Solver'), nl,
+    fd_statistics,
 
     % Display Output
     write('Output board'), nl, nl,

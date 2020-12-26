@@ -4,4 +4,6 @@
 :-use_module(library(aggregate)).
 :- [logic, display, utils, menus].
 
+cnote:-
+    main_menu.
 
