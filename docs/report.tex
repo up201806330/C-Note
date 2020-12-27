@@ -25,7 +25,7 @@
 % If the paper title is too long for the running head, you can set
 % an abbreviated paper title here
 %
-\author{João Sousa \and Rafael Ribeiro}
+\author{Jo\~ao Sousa \and Rafael Ribeiro}
 %
 \institute{FEUP-PLOG, Turma 3MIEIC05, Grupo C-Note\_1}
 %
@@ -40,11 +40,11 @@ This project, developed in the context of the curricular unit Logic Programming,
 %
 %
 \section{Introduction}
-This project was developed in the context of the final project for the curricular unit Logic Programming, in the 3rd year of the Masters in Informatics and Computing Engineering. The group had to find a possible solution for a decision/optimization problem using restriction programming. From the given options, the group chose a puzzle named \href{https://erich-friedman.github.io/puzzle/100/}{C-Note}, by Erich Friedman, which consists of a square matrix of single digits such that by adding digits before or after these, the sum of all rows and columns add up to 100.
+This project was developed in the context of the final project for the curricular unit Logic Programming, in the 3rd year of the Masters in Informatics and Computing Engineering. The group had to find a possible solution for a decision/optimization problem using restriction programming. From the given options, the group chose a puzzle named C-Note\cite{ref-cnote}, by Erich Friedman, which consists of a square matrix of single digits such that by adding digits before or after these, the sum of all rows and columns add up to 100.
 The article has the following structure:
 \begin{itemize}
     \item \textbf{Problem Description:} detailed description of the problem, including all involved restrictions.
-    \item \textbf{Approach:} description of modeling the problem as a Constraint Satisfaction Problem.
+    \item \textbf{Approach:} modeling description of the problem as a Constraint Satisfaction Problem.
     \begin{itemize}
         \item \textbf{Decision Variables:} description of decision variables and respective domains, as well as their meaning in the context of the problem.
         \item \textbf{Constraints:} description of hard and soft constraints, as well as their implementation using SICStus Prolog.
@@ -185,7 +185,7 @@ One can input an existing configuration through \textbf{option 1} (check example
 Through options \textbf{2 and 3}, the program will generate and then, if the user wishes, solve a new random puzzle. The latter restricts the generated puzzle so it has an \textbf{unique} solution.
 
 \section{Experiments and Results}
-To test the chosen approach, the group ran tests varying both dimension of the problem and the search heuristic used in labeling.
+To test the chosen approach, the group ran tests varying both the dimension of the problem and the search heuristic used in labeling.
 
 \subsection{Dimensional Analysis}
 The first variable to be tested was the \textbf{size of the puzzle}, where the values ranging from 3*3 to 7*7 were used. For this, puzzles with target sum 60 were generated for each test. Default labeling options were used. Graphs for this table found in the attachments. \ref{graphSizeT} \ref{graphSizeB} \ref{graphSizeC}
@@ -234,7 +234,7 @@ The other variable that was tested was the target sum of the rows and columns. P
 
 \newpage
 \subsection{Search Strategies}
-Tests were also done in the hopes of finding the most efficient search strategy used in the labeling process, below is the table of runtimes for all combinations of arguments of the predicate \verb!labeling([], Output)!\cite{ref-labeling-opts}. The options \verb!leftmost, smallest, largest, first_fail, anti_first_fail, occurrence,! \verb!most_constrained and max_regret! control the order in which the next variable is selected for assignment and the options \verb!step, enum, bisect, middle! \verb!and median! determine the way in which choices are made for the selected variable. These tests were all run on the 4*4 puzzle \verb![5, 2, 7, 1, 7, 1, 5, 9,! \verb!8, 8, 3, 7, 5, 2, 9, 1]!, with a target sum of 100.
+Tests were also done in the hopes of finding the most efficient search strategy used in the labeling process. Below is the table of runtimes for all combinations of arguments of the predicate \verb!labeling([], Output)!\cite{ref-labeling-opts}. The options \verb!leftmost, smallest, largest, first_fail, anti_first_fail, occurrence,! \verb!most_constrained and max_regret! control the order in which the next variable is selected for assignment and the options \verb!step, enum, bisect, middle! \verb!and median! determine the way in which choices are made for the selected variable. These tests were all run on the 4*4 puzzle \verb![5, 2, 7, 1, 7, 1, 5, 9,! \verb!8, 8, 3, 7, 5, 2, 9, 1]!, with a target sum of 100.
 
 
 \begin{table}
@@ -262,7 +262,7 @@ Some of the bigger obstacles faced were "switching" from the common imperative p
 
 Our solution could be improved upon, especially when it comes to generating unique solutions, which proved to be the slowest part of the program. We are not sure if much else in terms of restrictions and labeling could be done under the rules of the existing game.
 
-We find the project was a success in contributing positvely to our knowledge of Prolog and restriction programming, having definetly piqued our interest in this way of problem solving.
+To conclude, the project was a success in contributing positvely to our knowledge of Prolog and restriction programming, having definetely piqued our interest in this way of problem solving.
 \begin{thebibliography}{8}
 %\bibitem{ref_article1}
 %Author, F.: Article title. Journal \textbf{2}(5), 99--110 (2016)
@@ -284,12 +284,22 @@ We find the project was a success in contributing positvely to our knowledge of 
 %LNCS Homepage, \url{http://www.springer.com/lncs}. Last accessed 4
 %Oct 2017
 
+\bibitem{ref-cnote}
+Erich Friedman
+C-Note official page
+\url{https://erich-friedman.github.io/puzzle/100/}
+
 \bibitem{ref-labeling-opts}
-SICStus Documentation v.latest4 \url{https://sicstus.sics.se/sicstus/docs/latest4/html/sicstus.html/Enumeration-Predicates.html}
+SICStus Documentation v.latest4 
+\url{https://sicstus.sics.se/sicstus/docs/latest4/html/sicstus.html/Enumeration-Predicates.html}
 
 \bibitem{ref-more}
 Ulrich Neumerkel, Institut für Information Systems Engineering, Wien Austria Europe
 \url{http://www.complang.tuwien.ac.at/ulrich/sicstus-prolog/call_nth.pl}
+
+\bibitem{ref-clear}
+Useful command to clear the console
+\url{https://swi-prolog.discourse.group/t/useful-command-to-clear-the-console/976}
 
 \end{thebibliography}
 
